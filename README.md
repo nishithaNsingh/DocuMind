@@ -7,7 +7,6 @@ sdk: docker
 pinned: false
 ---
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
 # 🧠 DocuMind — AI Document Intelligence
 
 > A production-grade RAG (Retrieval-Augmented Generation) system for financial, legal, and compliance document Q&A. Built with hybrid retrieval, reranking, and hallucination-resistant answer generation.
@@ -82,8 +81,7 @@ documind/
 ### 1. Clone & install
 
 ```bash
-git clone https://github.com/yourusername/documind.git
-cd documind
+git clone https://github.com/nishithaNsingh/DocuMind.git
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
