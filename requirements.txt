@@ -1,29 +1,9 @@
-# ── API & serving ──────────────────────────────────────
 fastapi==0.111.0
 uvicorn[standard]==0.30.1
-
-# ── Vector DB ──────────────────────────────────────────
 qdrant-client==1.9.1
-
-# ── Embeddings (ONNX — no PyTorch, ~50MB) ──────────────
 fastembed==0.3.1
-
-# ── Sparse retrieval ───────────────────────────────────
 rank-bm25==0.2.2
-
-# ── Reranker ───────────────────────────────────────────
 cohere==5.5.3
-
-# ── LLM via OpenRouter ─────────────────────────────────
-openai==1.35.3
-
-# ── PDF ingestion (only needed for ingestion, not serve)─
-# unstructured[pdf]==0.14.4
-# pdfminer.six==20221105
-
-# ── Evaluation (only needed locally, not on HF) ────────
-# ragas==0.1.9
-# datasets==2.19.0
-
-# ── Env ────────────────────────────────────────────────
+openai==1.55.3
+httpx==0.27.2
 python-dotenv==1.0.1
