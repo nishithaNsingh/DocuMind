@@ -17,7 +17,7 @@ QDRANT_URL = os.getenv("QDRANT_URL")
 
 COLLECTION_NAME = "fintech_docs"
 
-# ✅ FREE embedding model
+
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 qdrant = QdrantClient(
