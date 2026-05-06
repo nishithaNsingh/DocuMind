@@ -9,12 +9,9 @@ pinned: false
 
 # 🧠 DocuMind — AI Document Intelligence
 
-> A production-grade RAG (Retrieval-Augmented Generation) system for financial, legal, and compliance document Q&A. Built with hybrid retrieval, reranking, and hallucination-resistant answer generation.
+Live at - https://huggingface.co/spaces/Nishitha11/DocuMind
 
-![Python](https://img.shields.io/badge/Python-3.11-blue?style=flat-square)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.111-green?style=flat-square)
-![Qdrant](https://img.shields.io/badge/Qdrant-VectorDB-red?style=flat-square)
-![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
+> A production-grade RAG (Retrieval-Augmented Generation) system for financial, legal, and compliance document Q&A. Built with hybrid retrieval, reranking, and hallucination-resistant answer generation.
 
 ---
 
@@ -199,4 +196,4 @@ python ragas_eval.py
 
 MIT — free to use, fork, and build on.
 
-Live at - https://huggingface.co/spaces/Nishitha11/DocuMind
+
