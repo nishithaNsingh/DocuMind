@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinTech RAG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0d0f11; --surface: #151820; --border: #222630;
+    --accent: #3b82f6; --accent2: #10b981; --text: #e2e8f0; --muted: #64748b;
+    --mono: 'IBM Plex Mono', monospace; --sans: 'IBM Plex Sans', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 48px 16px 80px; }
+  header { text-align: center; margin-bottom: 44px; animation: fadeUp 0.6s ease both; }
+  h1 { font-family: var(--mono); font-size: clamp(22px, 4vw, 32px); font-weight: 600; color: #fff; margin-bottom: 8px; }
+  .subtitle { color: var(--muted); font-size: 13px; font-weight: 300; }
+  .card { width: 100%; max-width: 680px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px; animation: fadeUp 0.6s 0.1s ease both; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .chip { font-family: var(--mono); font-size: 11px; border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; color: var(--muted); cursor: pointer; transition: all 0.15s; background: transparent; }
+  .chip:hover, .chip.active { border-color: var(--accent); color: var(--accent); background: #1e3a5f22; }
+  .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  input[type="text"] { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; color: var(--text); font-family: var(--sans); font-size: 14px; outline: none; transition: border-color 0.2s; }
+  input[type="text"]:focus { border-color: var(--accent); }
+  select { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; color: var(--muted); font-family: var(--mono); font-size: 12px; outline: none; cursor: pointer; }
+  button#askBtn { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 12px 24px; font-family: var(--mono); font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.1s; white-space: nowrap; }
+  button#askBtn:hover { background: #2563eb; }
+  button#askBtn:active { transform: scale(0.98); }
+  button#askBtn:disabled { background: #334155; cursor: not-allowed; }
+  .options-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .toggle-label { font-family: var(--mono); font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 7px; cursor: pointer; }
+  .toggle-label input { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
+  .speed-badge { font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 10px; background: #10b98122; color: var(--accent2); border: 1px solid #10b98144; }
+  #result { display: none; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px; }
+  .result-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--accent2); margin-bottom: 12px; }
+
+  /* Answer box */
+  .answer-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; font-size: 14px; line-height: 1.8; color: var(--text); }
+  .answer-box .intro { margin-bottom: 12px; color: #94a3b8; font-size: 13px; }
+  .answer-box ul { list-style: none; padding: 0; margin: 0; }
+  .answer-box ul li {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 10px 0; border-bottom: 1px solid #1e2430;
+  }
+  .answer-box ul li:last-child { border-bottom: none; padding-bottom: 0; }
+  .answer-box ul li .num {
+    font-family: var(--mono); font-size: 11px; font-weight: 700;
+    color: var(--accent); background: #1e3a5f33; border: 1px solid #1d4ed844;
+    border-radius: 4px; padding: 1px 6px; flex-shrink: 0; margin-top: 2px;
+  }
+  .answer-box ul li .text { flex: 1; }
+  .answer-box p { margin-bottom: 6px; }
+  .answer-loading { color: var(--muted); font-size: 13px; font-family: var(--mono); }
+
+  .sources { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .source-tag { font-family: var(--mono); font-size: 11px; background: #1d4ed822; border: 1px solid #1d4ed855; border-radius: 4px; padding: 3px 10px; color: #60a5fa; }
+  .meta { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 10px; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #ffffff44; border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
+  .error-box { background: #2d1215; border: 1px solid #7f1d1d; border-radius: 8px; padding: 14px 16px; color: #fca5a5; font-size: 13px; font-family: var(--mono); }
+  footer { margin-top: 40px; font-family: var(--mono); font-size: 11px; color: var(--muted); text-align: center; letter-spacing: 0.06em; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>DocuMind</h1>
+  <p class="subtitle">Ask questions across lending, insurance, compliance & financial docs</p>
+</header>
+
+<div class="card">
+  <div class="chips">
+    <span class="chip" onclick="setQuery(this, 'What documents are required for KYC?')">KYC documents</span>
+    <span class="chip" onclick="setQuery(this, 'What is CKYCR?')">CKYCR</span>
+    <span class="chip" onclick="setQuery(this, 'What are the loan repayment terms?')">Loan terms</span>
+    <span class="chip" onclick="setQuery(this, 'What does the insurance policy cover?')">Insurance coverage</span>
+    <span class="chip" onclick="setQuery(this, 'What is Apple revenue?')">Apple revenue</span>
+  </div>
+
+  <div class="form-row">
+    <input type="text" id="queryInput" placeholder="Ask anything about your documents…" onkeydown="if(event.key==='Enter') ask()">
+    <select id="docType">
+      <option value="">All docs</option>
+      <option value="lending">Lending</option>
+      <option value="insurance">Insurance</option>
+      <option value="compliance">Compliance</option>
+      <option value="financial">Financial</option>
+    </select>
+    <button id="askBtn" onclick="ask()">Ask</button>
+  </div>
+
+  <div class="options-row">
+    <label class="toggle-label">
+      <input type="checkbox" id="rerankToggle">
+      Use Cohere rerank
+    </label>
+    <span class="speed-badge" id="speedBadge">⚡ fast mode</span>
+  </div>
+
+  <div id="result">
+    <div class="result-label">ANSWER</div>
+    <div class="answer-box" id="answerBox"></div>
+    <div class="sources" id="sourcesBox"></div>
+    <div class="meta" id="metaBox"></div>
+  </div>
+</div>
+
+<footer>hybrid search · rrf · cohere rerank · deepseek · qdrant</footer>
+
+<script>
+  const API_BASE = window.location.origin;
+
+  document.getElementById('rerankToggle').addEventListener('change', function() {
+    document.getElementById('speedBadge').textContent = this.checked ? '🎯 accurate mode' : '⚡ fast mode';
+  });
+
+  function setQuery(el, text) {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('queryInput').value = text;
+  }
+
+  function renderAnswer(text) {
+    text = text.replace(/^answer:\s*/i, '').trim();
+
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+
+    // Detect if ANY line is a list item (bullet OR numbered)
+    const bulletRe  = /^[-•*]\s+(.+)/;
+    const numberedRe = /^\d+[\.\)]\s+(.+)/;
+
+    const hasListItems = lines.some(l => bulletRe.test(l) || numberedRe.test(l));
+
+    if (!hasListItems) {
+      // Plain paragraphs — just render as-is
+      return lines.map(l => `<p>${l}</p>`).join('');
+    }
+
+    // Mixed: intro text + list items
+    let html = '';
+    let listItems = [];
+    let introLines = [];
+    let counter = 1;
+
+    for (const line of lines) {
+      const bulletMatch   = line.match(bulletRe);
+      const numberedMatch = line.match(numberedRe);
+
+      if (bulletMatch || numberedMatch) {
+        // Flush intro
+        if (introLines.length) {
+          html += `<p class="intro">${introLines.join(' ')}</p>`;
+          introLines = [];
+        }
+        const content = bulletMatch ? bulletMatch[1] : numberedMatch[1];
+        listItems.push({ num: counter++, text: content });
+      } else {
+        // Flush list
+        if (listItems.length) {
+          html += buildList(listItems);
+          listItems = [];
+          counter = 1;
+        }
+        introLines.push(line);
+      }
+    }
+
+    // Flush remaining
+    if (introLines.length) html += `<p class="intro">${introLines.join(' ')}</p>`;
+    if (listItems.length)  html += buildList(listItems);
+
+    return html;
+  }
+
+  function buildList(items) {
+    const lis = items.map(item =>
+      `<li><span class="num">${item.num}</span><span class="text">${item.text}</span></li>`
+    ).join('');
+    return `<ul>${lis}</ul>`;
+  }
+
+  async function ask() {
+    const q = document.getElementById('queryInput').value.trim();
+    if (!q) return;
+
+    const docType    = document.getElementById('docType').value;
+    const useRerank  = document.getElementById('rerankToggle').checked;
+    const btn        = document.getElementById('askBtn');
+    const result     = document.getElementById('result');
+    const answerBox  = document.getElementById('answerBox');
+    const sourcesBox = document.getElementById('sourcesBox');
+    const metaBox    = document.getElementById('metaBox');
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Thinking…';
+    result.style.display = 'block';
+    answerBox.innerHTML = '<span class="answer-loading">Retrieving from vector store…</span>';
+    sourcesBox.innerHTML = '';
+    metaBox.textContent = '';
+
+    const t0 = Date.now();
+
+    try {
+      const params = new URLSearchParams({ q, use_rerank: useRerank });
+      if (docType) params.append('doc_type', docType);
+
+      const res = await fetch(`${API_BASE}/query?${params}`);
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+
+      const data   = await res.json();
+      const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+
+      answerBox.innerHTML  = renderAnswer(data.answer);
+      sourcesBox.innerHTML = (data.sources || []).map(s => `<span class="source-tag">📄 ${s}</span>`).join('');
+      metaBox.textContent  = `responded in ${elapsed}s · ${useRerank ? 'reranked' : 'rrf only'}`;
+    } catch (err) {
+      answerBox.innerHTML = `<div class="error-box">❌ ${err.message}</div>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Ask';
+    }
+  }
+</script>
+
+</body>
+</html>
