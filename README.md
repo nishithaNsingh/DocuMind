@@ -9,7 +9,7 @@ pinned: false
 
 # 🧠 DocuMind — AI Document Intelligence
 
-Live at - https://huggingface.co/spaces/Nishitha11/DocuMind
+
 
 > A production-grade RAG (Retrieval-Augmented Generation) system for financial, legal, and compliance document Q&A. Built with hybrid retrieval, reranking, and hallucination-resistant answer generation.
 
